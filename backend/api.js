@@ -1,4 +1,5 @@
-var userdb = require("./userscheam");
+var userdb = require("./Schema/userscheam");
+var userCategory=require('./Schema/categoriesSchema');
 const MailGen = require('mailgen')
 const keys=require('./keys');
 const passport=require('passport');
@@ -9,6 +10,17 @@ const mongoose=require('mongoose');
 const sendmail=require('./template');
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const usedbPost=require('./Schema/uploadPost');
+var multer  = require('multer');
+//  var storage = multer.diskStorage({
+//      destination: function (req, file, cb) {
+//        cb(null, 'upload/public/posts');
+//      },
+//      filename: function (req, file, cb) {
+//        cb(null,file.originalname);
+//      }
+//    });   
+// var upload = multer({ storage:storage });
 
 const msg = {
     to: '',
@@ -44,22 +56,20 @@ var transport = nodemailer.createTransport({
 
     return new Promise((resolve,reject)=>{
     
-        console.log("user log: "+data.password);
-    
-        userdb.find({'email':''+data.email,'password':data.password},'email',(err,email)=>{
-    
-            console.log('login in api',email);
+        userdb.find({'email':''+data.email,'password':data.password},'',(err,data)=>{   
+            console.log('login in api',data);
             if(err) {
                 console.log(err);
                 reject(false);
             }
             else {
-                if(email.length===1){
-                 console.log("SUCCESSFULLY  LOOGED IN "); 
-                   resolve(true);
+                if(data.length===1){
+                    console.log("Successfully logged in!!!");
+                    resolve(data);
                     }
                 else{ 
-                    console.log("INVALID PASSWORD ");}
+                   
+                    console.log("INVALID PASSWORD ",data);}
                     resolve(false);
               } 
             });
@@ -70,10 +80,79 @@ var transport = nodemailer.createTransport({
     };
 
 
-let ForgetPassword=(data)=>{
+
+
+
+let addComment=(data)=>{
+    console.log('api add comment',data);
+    return new Promise((resolve,reject)=>{
+            usedbPost.update({_id:data.postId},{$push:{commentArray:{personId:data.personId,comment:data.comment}}},(err,data)=>{
+                if(err)reject(false)
+                console.log('data in api of comment',data);
+                resolve(data)
+
+            })
+
+    })
+}
+
+
+let getSinglePostData=(data)=>{
+
+return new Promise((resolve,reject)=>{
+    usedbPost.find({_id:data.postId},'',(err,newData)=>{
+        if(err)reject(false)
+           console.log(newData)
+            resolve(newData)
+
+    })   
+
+})
+}
+
+
+
+let  managePost=(data)=>{  
+    console.log('manage post data',data) 
+        return new Promise((resolve,reject)=>{
+            usedbPost.find({_id:data.imageId,likes:data.accountId},(err,dataParent)=>{  
+                  if(dataParent.length===0){       
+                    usedbPost.update({ _id:data.imageId },{$push:{[data.eventName]:data.accountId}},(err,dataChild)=>{
+                        if(err)reject(err)
+                            usedbPost.find({},'',(err,newData)=>{
+                                if(err)reject(false)
+                                   console.log(newData)
+                                    resolve(newData)
+
+                            })
+                            
+                    })
+                  }else{
+                    usedbPost.update({ _id:data.imageId },{$pull:{[data.eventName]:data.accountId}},(err,dataChild)=>{
+                        if(err)reject(err)
+                        usedbPost.find({},'',(err,newData)=>{
+                            if(err)reject(false)
+                             console.log(newData)
+                                resolve(newData)
+
+                        })
+        
+                    })
+                  }
+                
+
+
+               })
+            })
+}
+
+
+
+
+let ResetPassword=(data)=>{
     
     return new Promise((resolve,reject)=>{
-        var myquery = { email: data.email };
+        var myquery = { _id: data.email };
         var newvalues = { $set: {password:data.password } };
         userdb.updateOne(myquery, newvalues, function(err, res) {
              if (err) throw reject(false);
@@ -86,6 +165,24 @@ let ForgetPassword=(data)=>{
 
 
 }
+
+
+allPost=(data)=>{
+
+ return   new Promise((resolve,reject)=>{
+        usedbPost.find({} , ''   ,(err,data)=>{
+            if(err){
+                reject(err)
+            }else{
+                console.log(data)
+                resolve(data);
+            }   
+
+        });
+    });
+}
+
+
 
 /*---Validate function for the user  called in router-------*/  
 let   Validate=(data)=>{
@@ -118,6 +215,63 @@ let   Validate=(data)=>{
      
        };
        
+
+
+
+
+       const uploadDate=(data)=>{
+   
+   return new Promise((resolve,reject)=>{
+        console.log('pic data',data)
+            usedbPost.create(data,function(err,result){
+                if(err){
+                    reject(err)
+                }else{
+                  resolve(result);  
+                }
+            }) 
+       })
+    
+    
+    
+    }
+
+
+    const getUserData=(data)=>{
+       return new Promise((resolve,reject)=>{
+           
+           userdb.find({_id:data._id},(err,data)=>{
+            if(err)reject(false)
+            resolve(data);
+            
+           })
+       })
+
+    }
+
+    let CreateCategories=(data)=>{
+        return new Promise((resolve,reject)=>{
+            console.log(data)
+            userCategory.updateMany({},{$addToSet:{categoriesArray:data.category}}, { upsert : true },(err,data)=>{
+                if(err)reject(false)
+                resolve(data)
+            })
+
+        })
+    }
+
+    let getCategories=()=>{
+        return new Promise((resolve,reject)=>{
+           
+            userCategory.find({},'',(err,data)=>{
+                if(err)reject(false)
+                resolve(data)
+            })
+
+        })
+
+    }
+
 /*---Create database function for the user  called in router-------*/  
   
    let  CreateUser=(data)=>{
@@ -229,21 +383,23 @@ const updateVerified=(data)=>{
 
 }
 
+
   
 
 let checkEmailExists=(data)=>{
 
-    console.log(data);
-    new Promise((resolve,reject)=>{
-
-        userdb.find({'email':data},'email',(err,email)=>{
+  //  console.log('data in api',data);
+  return  new Promise((resolve,reject)=>{
+        userdb.find({'email':data},'',(err,data)=>{
             if(err){
                 reject(err)}
             else{
-                if(email.length===0)
-                    resolve(false)
-                else
-                    resolve(true);
+                if(data.length===1){
+                        console.log('data existence',data)
+                        resolve(data);}
+                else{
+                    resolve(false);}
+                
             }
 
 
@@ -257,5 +413,13 @@ let checkEmailExists=(data)=>{
     
 
 
-module.exports={ForgetPassword,Validate,CreateUser,Login,passport,GoogleStrategy,sendMail,nodeMailerSend,updateVerified,checkEmailExists};
+module.exports={
+    getCategories
+    ,getUserData,
+    getSinglePostData,addComment,
+    managePost,allPost,uploadDate,ResetPassword,
+    Validate,CreateUser,Login,passport,GoogleStrategy,
+    sendMail,nodeMailerSend,updateVerified,
+    checkEmailExists,
+    CreateCategories};
     

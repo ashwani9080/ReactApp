@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
+import Header from './Header';
+import {Link,Redirect} from 'react-router-dom'
 class Register extends React.Component{
   constructor(props){
     super(props);
@@ -11,14 +13,13 @@ class Register extends React.Component{
       lastName:'',
       phone:'',
       conditionalcss:false,
-      signInMessage:''
+      signInMessage:'',
+     
           }
+
+          this.props.setHeaderState(false);
   }
 
-
-  handleClick=()=>{
-    this.props.onClick();
-}
 
 
   handleUserInput=(event)=>{
@@ -44,17 +45,11 @@ class Register extends React.Component{
                 }else if(data.data==='User created'){
                   
                   this.setState({signInMessage:data.data});
-                  this.props.onClick()
-                    
-
                 }
 
       });
 
   }
-
-  
-
 
     
 
@@ -99,29 +94,7 @@ class Register extends React.Component{
                   </div>
                 </div>
               </div>
-              <div className="header">
-                <div className="header_lft">
-                  <div className="logo"><a href="#"><img src="images/logo.png" /></a></div>
-                  <div className="navigatn">
-                    <ul>
-                      <li><a href="#" className="active">Home</a></li>
-                      <li><a href="#"> E-Coupons </a></li>
-                      <li><a href="#">E-Brands </a></li>
-                      <li><a href="#"> Resuse Market </a></li>
-                      <li><a href="#"> Lost and Found</a></li>
-                    </ul>
-                  </div>
-                </div>
-                <div className="header_rgt">
-                  <div className="flag_div"><img src="images/flag.png" /></div>
-                  <input type="text" placeholder="Search" className="txt_box" />
-                  <div className="msg_box"><a href="#"><span className="msg_count">100</span></a></div>
-                  <div className="info_div">
-                    <div className="image_div"> <img src="images/pic.png" /> </div>
-                    <div className="info_div1">Me</div>
-                  </div>
-                </div>
-              </div>
+            {/* {<Header/>} */}
               <div className="container">
                 <div className="content">
                   <div className="content_rgt">
@@ -134,13 +107,14 @@ class Register extends React.Component{
                         <li><span>Last Name</span><input value={this.state.lastName} name='lastName' type="text" placeholder="Enter your last anme"  onChange={this.handleUserInput} required/></li>
                         <li><span>Phone Number</span><input pattern="[0-9]{10}" type='text' name='phone' value={this.state.phone}  placeholder="Enter your phone"  onChange={this.handleUserInput} required/></li>
                         <li><span>Password</span><input value={this.state.password} pattern="[a-z0-9].{6,}"   name='password' type="text" placeholder="6 character long and contain number and alphabet "  onChange={this.handleUserInput} required/></li>
-                        <li><input type="checkbox" />I agree to Term &amp; Conditions</li>
+                        <li><input type="checkbox"  required/>I agree to Term &amp; Conditions</li>
                         <li><input type="submit" defaultValue="Register"  /></li>
+                        {this.state.signInMessage==='User created'?<Redirect to="/login" />:null}
                         <div name='user_create'  style={{color:'red'}}>{this.state.signInMessage}</div>
                       </ul>
                       </form>
 
-                      <div className="addtnal_acnt">I already have an account.<a onClick={this.handleClick}>Login My Account !</a></div>
+                      <div className="addtnal_acnt">I already have an account.<Link to='/login' onClick={this.handleClick}>Login My Account !</Link></div>
                     </div>
                   </div>
                   <div className="content_lft">
@@ -150,20 +124,7 @@ class Register extends React.Component{
                 </div>
               </div>
               <div className="clear" />
-              <div className="footr">
-                <div className="footr_lft">
-                  <div className="footer_div1">Copyright © Pet-Socail 2014 All Rights Reserved</div>
-                  <div className="footer_div2"><a href="#">Privacy Policy </a>| <a href="#"> Terms &amp; Conditions</a></div>
-                </div>
-                <div className="footr_rgt">
-                  <ul>
-                    <li><a href="#"><img src="images/social_1.png" /></a></li>
-                    <li><a href="#"><img src="images/social_2.png" /></a></li>
-                    <li><a href="#"><img src="images/social_3.png" /></a></li>
-                    <li><a href="#"><img src="images/social_4.png" /></a></li>
-                  </ul>
-                </div>
-              </div>
+            
             </div>
           );
     }

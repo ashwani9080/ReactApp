@@ -1,0 +1,25 @@
+#form{
+    display: flex;
+    background-color: rgb(220, 226, 224);
+    margin: 2%;
+    padding: 10%;
+    height:50vh;
+    flex-direction: column;
+    
+}
+
+#form input{
+    width: 50%;
+    align-self: center;   
+}
+
+
+#form select{
+    width: 50%;
+    align-self: center;   
+}
+
+#form div{
+    width: 50%;
+    align-self: center;   
+}

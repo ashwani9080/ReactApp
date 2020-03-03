@@ -16,9 +16,8 @@ app.use(bodyParser.json());
 
 mongoose.connect('mongodb://localhost:27017/webdatabase',
 { useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false,
-  useCreateIndex: true,
+  useUnifiedTopology: true
+ 
 }).then(()=>{console.log('connected to db')}).catch(err=>{console.log(err)});
 
 

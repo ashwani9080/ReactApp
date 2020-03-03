@@ -1,8 +1,53 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import axios from 'axios';
+import queryString from 'querystring';
+import {Redirect} from 'react-router-dom'
 class Reset extends React.Component{
-    render(){
+  constructor(props){
+    super(props)
+    this.state={
+        email: this.props.match.params.id,
+        password:'',
+        confirmPassword:'',
+        emailValidateMessage:'',
+        isAuth:false};
+
+       
+        //console.log(this.props.match)
+  }
+
+
+  handleInput=(event)=>{
+
+    let nameDefined=event.target.name;
+    this.setState({[nameDefined]:event.target.value});
+  
+   
+  }
+
+  handleSubmit=(event)=>{
         
+    console.log('reset',this.state.email)
+    
+            const user ={email:this.state.email,password:this.state.password}
+             axios.post('http://localhost:8086/resetPassword',  user )
+                .then((data) => {     
+                   if(data.data===true){
+                     this.setState({isAuth:true});  
+
+                   }else{    
+                       this.setState({conditionalcss:true,logInMessage:"Something went wrong"})
+                   }
+    
+          });
+          event.preventDefault(); 
+    
+      }
+
+
+
+    render(){
         return (
             <div>
               <meta charSet="utf-8" />
@@ -39,39 +84,19 @@ class Reset extends React.Component{
                   </div>
                 </div>
               </div>
-              <div className="header">
-                <div className="header_lft">
-                  <div className="logo"><a href="#"><img src="images/logo.png" /></a></div>
-                  <div className="navigatn">
-                    <ul>
-                      <li><a href="#" className="active">Home</a></li>
-                      <li><a href="#"> E-Coupons </a></li>
-                      <li><a href="#">E-Brands </a></li>
-                      <li><a href="#"> Resuse Market </a></li>
-                      <li><a href="#"> Lost and Found</a></li>
-                    </ul>
-                  </div>
-                </div>
-                <div className="header_rgt">
-                  <div className="flag_div"><img src="images/flag.png" /></div>
-                  <input type="text" placeholder="Search" className="txt_box" />
-                  <div className="msg_box"><a href="#"><span className="msg_count">100</span></a></div>
-                  <div className="info_div">
-                    <div className="image_div"> <img src="images/pic.png" /> </div>
-                    <div className="info_div1">Me</div>
-                  </div>
-                </div>
-              </div>
+           { this.state.isAuth?<Redirect to={'/'} />:null }
               <div className="container">
                 <div className="content">
                   <div className="content_rgt">
                     <div className="register_sec">
                       <h1>Reset Password</h1>
+                      <form  onSubmit={this.handleSubmit}>
                       <ul>
-                        <li><span>Enter New Password</span><input type="text" placeholder="Enter your new password" /></li>
-                        <li><span>Confirm Password</span><input type="text" placeholder="Enter your password again" /></li>
+                        <li><span>Enter New Password</span><input type="text" name='password'        onChange={this.handleInput}   value={this.state.password} placeholder="Enter your new password" /></li>
+                        <li><span>Confirm Password</span><input type="text" style={{display:'none'}}  name='confirmPassword'   onChange={this.handleInput} value={this.state.confirmPassword} placeholder="Enter your password again" /></li>
                         <li><input type="submit" defaultValue="Submit" /></li>
                       </ul>
+                      </form>
                     </div>
                   </div>
                   <div className="content_lft">
@@ -81,20 +106,7 @@ class Reset extends React.Component{
                 </div>
               </div>
               <div className="clear" />
-              <div className="footr">
-                <div className="footr_lft">
-                  <div className="footer_div1">Copyright © Pet-Socail 2014 All Rights Reserved</div>
-                  <div className="footer_div2"><a href="#">Privacy Policy </a>| <a href="#"> Terms &amp; Conditions</a></div>
-                </div>
-                <div className="footr_rgt">
-                  <ul>
-                    <li><a href="#"><img src="images/social_1.png" /></a></li>
-                    <li><a href="#"><img src="images/social_2.png" /></a></li>
-                    <li><a href="#"><img src="images/social_3.png" /></a></li>
-                    <li><a href="#"><img src="images/social_4.png" /></a></li>
-                  </ul>
-                </div>
-              </div>
+             
             </div>
           );
     }
