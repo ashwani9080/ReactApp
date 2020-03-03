@@ -13,6 +13,7 @@ export default class Posts extends React.Component{
       postClicked:false,
       id:0,
       likes:0,
+     
       
     }
   }
@@ -42,12 +43,12 @@ export default class Posts extends React.Component{
 
     handleClick=(event)=>{
 
-   //  console.log('post cliked',this.props)
-   
+     console.log('post cliked',event.target.name);
+     newArray[event.target.id].postNumber=event.target.id;
      this.setState({postClicked:true,id:event.target.id});
-    
-
     }
+
+
     handleClickPost=(event)=>{
       
       const eventName={eventName:event.target.id,accountId:this.props.id,imageId:event.target.name};
@@ -85,7 +86,7 @@ export default class Posts extends React.Component{
         //  console.log('array',array)
       
         return(
-        <div  id={array._id} >
+        <div  id={array._id}  name={index} >
          <div className="contnt_2"  >
           <div className="div_a">
             <div className="div_title">{array.title}</div>
@@ -103,7 +104,7 @@ export default class Posts extends React.Component{
                   <li  ><a  id='share' name={array._id} ><span  className="btn_icon"><img name={array._id} id="share" src="/images/icon_001.png" alt="share" /></span>Share</a></li>
                   <li ><a  id="flag" name={array._id}><span  className="btn_icon"><img name={array._id} id="flag" src="/images/icon_002.png" alt="share" /></span>Flag</a></li>
                   <li  ><a id="likes"  name={array._id} onClick={this.handleClickPost} ><span  className="btn_icon"><img name={array._id} id="likes" src="/images/icon_003.png" alt="share" /></span>{array.likes.length} </a></li>
-                  <li><a onClick={this.handleClick} name={array._id} id={index} ><span   className="btn_icon"><img name={array._id} id={index} src="/images/icon_004.png" alt="share" /></span>{array.commentArray.length} Comments</a></li>
+                  <li><a onClick={this.handleClick} name={array._id}   id={index} ><span   className="btn_icon"><img name={array._id} id={index} src="/images/icon_004.png" alt="share" /></span>{array.commentArray.length} Comments</a></li>
                 </ul>
               </div>
             </div>
@@ -122,7 +123,7 @@ export default class Posts extends React.Component{
               <div>
                   {this.makePosts()}
                   {this.state.postClicked?<Redirect 
-                  to={{pathname:'/singlepost',state:newArray[this.state.id]}}
+                  to={{pathname:'/singlepost',state:newArray[this.state.id]}} 
                   ></Redirect> : null}
               </div>
           );

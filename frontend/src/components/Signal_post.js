@@ -10,22 +10,22 @@ import { isArray } from 'util';
       commentBox:'',
       postData:this.props.location.state,
       clickEvent:false,
+      postNumber:this.props.location.state.postNumber,
     }
    
+    console.log('single post id',props.location.state)
   }
   handleClickPost=(event)=>{
       
-    console.log('post data',this.state.postData)
+  
 
     const eventName={eventName:event.target.name,accountId:localStorage.getItem('accountId'),imageId:this.state.postData._id};
-    console.log(this.state.postData )
-    console.log(eventName)
+  
     
     axios.post('http://localhost:8086/postevent',eventName).
         then((date)=>{
-          //  console.log('data after click post',date.data);
-            this.setState({postData: date.data[0]})
-           // this.setState({likes:date.data[0].likes.length})
+           console.log('data after click post',date.data);
+            this.setState({postData: date.data[this.state.postNumber]})
         })
 
   }
@@ -41,9 +41,6 @@ import { isArray } from 'util';
     event.preventDefault();
 
     const comment={comment:this.state.commentBox,postId:this.props.location.state._id,personId:localStorage.getItem('username')}
- 
-    console.log('comment',this.state.postData)
-
     axios.post('http://localhost:8086/addcomment',comment).
     then((data)=>{
      

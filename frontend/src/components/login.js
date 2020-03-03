@@ -24,10 +24,7 @@ class Login extends React.Component{
           const mail=localStorage.getItem('id');
              props.history.push(`/home/${mail}`)
            }  
-      
-     
         
-       
        
     }
     componentDidMount(){

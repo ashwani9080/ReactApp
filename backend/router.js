@@ -27,10 +27,15 @@ router.get('/logout',(req,res)=>{
 
 
 router.post('/postevent', async (req,res)=>{
-
+try{
+  console.log('likes event',req.body)
   let result=await userapi.managePost(req.body);
-    console.log(result);
-    res.send(result)
+  console.log(result);
+  res.send(result)
+}catch{
+  res.send(false);
+}
+ 
     
   
 })
